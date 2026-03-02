@@ -1,6 +1,6 @@
 # CIDR Explainer (Conversational Draft)
 
-Author: Shannon Kuehn
+Author: Shannon Eldridge-Kuehn c. 2026
 
 CIDR is one of those things that looks scarier than it is, mostly because a lot of subnet explanations start in binary and stay there forever. The trick is to stop seeing CIDR as math homework and start seeing it as a boundary. An IP address is a starting point, and the slash is the fence line that tells you how big the neighborhood is.
 
