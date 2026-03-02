@@ -8,6 +8,8 @@ set -euo pipefail
 # Defaults:
 #   rule-name: Allow-My-IP-SSH
 #   priority: 1000
+#
+# Author: Shannon B. Eldridge-Kuehn (2026)
 
 RG="${1:-}"
 NSG="${2:-}"
