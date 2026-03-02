@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Author: Shannon Kuehn
+# Author: Shannon Eldridge-Kuehn
 # Purpose: Allowlist your current public IPv4 address (/32) on an Azure Storage Account firewall.
 # Usage:
 #   ./azure-storage-allow-my-ip.sh <resource-group> <storage-account-name>
