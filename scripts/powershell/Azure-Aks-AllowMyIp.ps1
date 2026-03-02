@@ -3,7 +3,7 @@
 Restrict AKS API server access to your current public IPv4 address (/32).
 
 .AUTHOR
-Shannon Kuehn
+Shannon Eldridge-Kuehn c. 2026
 
 .PARAMETER ResourceGroup
 Resource group name.
