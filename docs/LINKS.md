@@ -1,7 +1,5 @@
 # Technical Links
 
-You can paste these at the end of your blog entry.
-
 - Add-AzKeyVaultNetworkRule (Az.KeyVault): https://learn.microsoft.com/en-us/powershell/module/az.keyvault/add-azkeyvaultnetworkrule
 - Add-AzStorageAccountNetworkRule (Az.Storage): https://learn.microsoft.com/en-us/powershell/module/az.storage/add-azstorageaccountnetworkrule
 - Set-AzAksCluster (Az.Aks): https://learn.microsoft.com/en-us/powershell/module/az.aks/set-azakscluster
