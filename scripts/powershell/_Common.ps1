@@ -1,7 +1,7 @@
 <#
 Common helpers for this repo.
 
-Author: Shannon Kuehn
+Shannon Eldridge-Kuehn c. 2026
 #>
 
 function Assert-AzPowerShellReady {
