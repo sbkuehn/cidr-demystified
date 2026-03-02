@@ -1,7 +1,5 @@
 # Technical Links
 
-You can paste these at the end of your blog entry.
-
 - Azure CLI NSG rules: https://learn.microsoft.com/en-us/cli/azure/network/nsg/rule?view=azure-cli-latest
 - Azure CLI Storage network rules: https://learn.microsoft.com/en-us/cli/azure/storage/account/network-rule?view=azure-cli-latest
 - Azure Storage network security: https://learn.microsoft.com/en-us/azure/storage/common/storage-network-security
