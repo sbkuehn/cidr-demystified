@@ -3,7 +3,7 @@
 Create or update an NSG rule to allow SSH (22) only from your current public IPv4 address (/32).
 
 .AUTHOR
-Shannon Kuehn
+Shannon Eldridge-Kuehn c. 2026
 
 .PARAMETER ResourceGroup
 Resource group name.
