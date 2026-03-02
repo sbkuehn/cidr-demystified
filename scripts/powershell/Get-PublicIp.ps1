@@ -3,7 +3,7 @@
 Print your current public IPv4 address.
 
 .AUTHOR
-Shannon Kuehn
+Shannon Eldridge-Kuehn c. 2026
 
 .EXAMPLE
 ./Get-PublicIp.ps1
