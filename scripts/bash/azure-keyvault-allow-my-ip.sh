@@ -4,6 +4,8 @@ set -euo pipefail
 # Allow your current public IP (/32) to access an Azure Key Vault via firewall rules.
 # Usage:
 #   ./azure-keyvault-allow-my-ip.sh <resource-group> <keyvault-name>
+#
+# Author: Shannon B. Eldridge-Kuehn (2026)
 
 RG="${1:-}"
 KV="${2:-}"
