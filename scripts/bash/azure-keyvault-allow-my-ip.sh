@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Author: Shannon Eldridge-Kuehn
+# Author: Shannon Eldridge-Kuehn c. 2026
 # Purpose: Allowlist your current public IPv4 address (/32) on an Azure Key Vault firewall.
 # Usage:
 #   ./azure-keyvault-allow-my-ip.sh <resource-group> <keyvault-name>
