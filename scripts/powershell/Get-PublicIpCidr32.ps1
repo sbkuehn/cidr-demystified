@@ -1,13 +1,16 @@
 <#
 .SYNOPSIS
-Returns your current public IPv4 address as a /32 CIDR.
+Print your current public IPv4 address as a /32 CIDR value.
+
+.AUTHOR
+Shannon Kuehn
 
 .EXAMPLE
 ./Get-PublicIpCidr32.ps1
 #>
 
-[CmdletBinding()]
-param()
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
 
 $ip = (Invoke-RestMethod -Uri "https://api.ipify.org?format=json" -Method Get -TimeoutSec 15).ip
-"{0}/32" -f $ip
+"$ip/32"

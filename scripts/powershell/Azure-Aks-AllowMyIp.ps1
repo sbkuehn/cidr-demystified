@@ -3,7 +3,6 @@ function Assert-AzCliReady {
         throw "Azure CLI (az) is required but was not found. Install it, then retry."
     }
 
-    # Light login check
     $null = & az account show 2>$null
     if ($LASTEXITCODE -ne 0) {
         throw "You are not logged in to Azure CLI. Run: az login"
@@ -13,11 +12,14 @@ function Assert-AzCliReady {
 
 <#
 .SYNOPSIS
-Restrict AKS API server access to your current public IP (/32).
+Restrict AKS API server access to your current public IPv4 address (/32).
+
+.AUTHOR
+Shannon Kuehn
 
 .DESCRIPTION
-This overwrites the full authorized IP ranges list to only include your current IP.
-If you have multiple allowed IPs, extend this script to merge ranges.
+This sets the authorized IP ranges to only your current IP.
+If you need multiple ranges, update this script to merge them.
 
 .PARAMETER ResourceGroup
 Resource group name.
@@ -29,7 +31,9 @@ AKS cluster name.
 ./Azure-Aks-AllowMyIp.ps1 -ResourceGroup myRg -AksName myAks
 #>
 
-[CmdletBinding()]
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
 param(
     [Parameter(Mandatory=$true)]
     [string]$ResourceGroup,
@@ -43,6 +47,7 @@ Assert-AzCliReady
 $ip = (Invoke-RestMethod -Uri "https://api.ipify.org?format=json" -Method Get -TimeoutSec 15).ip
 $cidr = "$ip/32"
 
-Write-Host "Setting AKS authorized IP ranges to: $cidr"
+Write-Host "About to set AKS authorized IP ranges to: $cidr"
 Write-Host "Cluster: $AksName (RG: $ResourceGroup)"
 & az aks update -g $ResourceGroup -n $AksName --api-server-authorized-ip-ranges $cidr | Out-Host
+Write-Host "Done."

@@ -3,7 +3,6 @@ function Assert-AzCliReady {
         throw "Azure CLI (az) is required but was not found. Install it, then retry."
     }
 
-    # Light login check
     $null = & az account show 2>$null
     if ($LASTEXITCODE -ne 0) {
         throw "You are not logged in to Azure CLI. Run: az login"
@@ -13,7 +12,10 @@ function Assert-AzCliReady {
 
 <#
 .SYNOPSIS
-Create or update an NSG inbound rule to allow SSH (22) ONLY from your current public IP (/32).
+Create or update an NSG rule to allow SSH (22) only from your current public IPv4 address (/32).
+
+.AUTHOR
+Shannon Kuehn
 
 .PARAMETER ResourceGroup
 Resource group name.
@@ -25,13 +27,15 @@ Network Security Group name.
 Rule name. Default: Allow-My-IP-SSH
 
 .PARAMETER Priority
-Rule priority. Default: 1000
+Priority. Default: 1000
 
 .EXAMPLE
 ./Azure-Nsg-AllowMyIpSsh.ps1 -ResourceGroup myRg -NsgName myNsg
 #>
 
-[CmdletBinding()]
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
 param(
     [Parameter(Mandatory=$true)]
     [string]$ResourceGroup,
@@ -49,7 +53,7 @@ Assert-AzCliReady
 $ip = (Invoke-RestMethod -Uri "https://api.ipify.org?format=json" -Method Get -TimeoutSec 15).ip
 $cidr = "$ip/32"
 
-Write-Host "Creating/updating NSG rule: $RuleName"
+Write-Host "About to create or update NSG rule: $RuleName"
 Write-Host "NSG: $NsgName (RG: $ResourceGroup)"
 Write-Host "Source: $cidr -> Destination port 22"
 
@@ -66,3 +70,5 @@ Write-Host "Source: $cidr -> Destination port 22"
   --destination-address-prefixes "*" `
   --destination-port-ranges 22 `
   --description "Allow SSH from my current public IP only" | Out-Host
+
+Write-Host "Done."
