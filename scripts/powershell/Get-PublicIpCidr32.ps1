@@ -3,7 +3,7 @@
 Print your current public IPv4 address as a /32 CIDR value.
 
 .AUTHOR
-Shannon Kuehn
+Shannon Eldridge-Kuehn c. 2026
 
 .EXAMPLE
 ./Get-PublicIpCidr32.ps1
