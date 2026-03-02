@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Author: Shannon Eldridge-Kuehn
+# Author: Shannon Eldridge-Kuehn c. 2026
 # Purpose: Print your current public IPv4 address.
 # Usage:
 #   ./get-public-ip.sh
