@@ -7,6 +7,8 @@ set -euo pipefail
 #
 # Note: This overwrites the full authorized IP ranges list to only include your current IP.
 # If you have multiple allowed IPs, use the "append" script pattern instead.
+#
+# Author: Shannon B. Eldridge-Kuehn (2026)
 
 RG="${1:-}"
 AKS="${2:-}"
