@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Author: Shannon Kuehn
+# Author: Shannon Eldridge-Kuehn c. 2026
 # Purpose: Restrict AKS API server access to your current public IPv4 address (/32).
 # Usage:
 #   ./azure-aks-allow-my-ip.sh <resource-group> <aks-name>
