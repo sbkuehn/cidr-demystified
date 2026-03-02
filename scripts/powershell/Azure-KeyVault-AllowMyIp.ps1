@@ -3,7 +3,7 @@
 Allowlist your current public IPv4 address (/32) on an Azure Key Vault firewall.
 
 .AUTHOR
-Shannon Kuehn
+Shannon Eldridge-Kuehn c. 2026
 
 .PARAMETER ResourceGroup
 Resource group name.
