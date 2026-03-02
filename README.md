@@ -2,7 +2,7 @@
 
 Practical helper scripts to go with a conversational CIDR explainer (IPv4 and IPv6) and the very real cloud task we all do: allowlisting your current source IP.
 
-Author: Shannon Kuehn
+Author: Shannon Eldridge-Kuehn c. 2026
 
 ## What’s in here
 
