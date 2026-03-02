@@ -4,6 +4,8 @@ set -euo pipefail
 # Allow your current public IP (/32) to access an Azure Storage Account via firewall rules.
 # Usage:
 #   ./azure-storage-allow-my-ip.sh <resource-group> <storage-account-name>
+#
+# Author: Shannon B. Eldridge-Kuehn (2026)
 
 RG="${1:-}"
 SA="${2:-}"
