@@ -1,15 +1,3 @@
-function Assert-AzCliReady {
-    if (-not (Get-Command az -ErrorAction SilentlyContinue)) {
-        throw "Azure CLI (az) is required but was not found. Install it, then retry."
-    }
-
-    $null = & az account show 2>$null
-    if ($LASTEXITCODE -ne 0) {
-        throw "You are not logged in to Azure CLI. Run: az login"
-    }
-}
-
-
 <#
 .SYNOPSIS
 Create or update an NSG rule to allow SSH (22) only from your current public IPv4 address (/32).
@@ -29,8 +17,14 @@ Rule name. Default: Allow-My-IP-SSH
 .PARAMETER Priority
 Priority. Default: 1000
 
+.PARAMETER WhatIf
+Shows what would happen if the command runs. No changes are made.
+
 .EXAMPLE
 ./Azure-Nsg-AllowMyIpSsh.ps1 -ResourceGroup myRg -NsgName myNsg
+
+.NOTES
+Uses Az.Network cmdlets (no Azure CLI).
 #>
 
 Set-StrictMode -Version Latest
@@ -45,30 +39,56 @@ param(
 
     [string]$RuleName = "Allow-My-IP-SSH",
 
-    [int]$Priority = 1000
+    [int]$Priority = 1000,
+
+    [switch]$WhatIf
 )
 
-Assert-AzCliReady
+. "$PSScriptRoot/_Common.ps1"
+Assert-AzPowerShellReady
 
-$ip = (Invoke-RestMethod -Uri "https://api.ipify.org?format=json" -Method Get -TimeoutSec 15).ip
-$cidr = "$ip/32"
+$cidr = Get-PublicIpv4Cidr32
 
 Write-Host "About to create or update NSG rule: $RuleName"
 Write-Host "NSG: $NsgName (RG: $ResourceGroup)"
 Write-Host "Source: $cidr -> Destination port 22"
 
-& az network nsg rule create `
-  -g $ResourceGroup `
-  --nsg-name $NsgName `
-  -n $RuleName `
-  --priority $Priority `
-  --access Allow `
-  --protocol Tcp `
-  --direction Inbound `
-  --source-address-prefixes $cidr `
-  --source-port-ranges "*" `
-  --destination-address-prefixes "*" `
-  --destination-port-ranges 22 `
-  --description "Allow SSH from my current public IP only" | Out-Host
+if ($WhatIf) {
+    Write-Host "WhatIf: update NSG rule config then Set-AzNetworkSecurityGroup"
+    return
+}
+
+$nsg = Get-AzNetworkSecurityGroup -ResourceGroupName $ResourceGroup -Name $NsgName
+$existingRule = $nsg.SecurityRules | Where-Object { $_.Name -eq $RuleName }
+
+if ($null -ne $existingRule) {
+    $nsg = Set-AzNetworkSecurityRuleConfig `
+        -NetworkSecurityGroup $nsg `
+        -Name $RuleName `
+        -Description "Allow SSH from my current public IP only" `
+        -Access Allow `
+        -Protocol Tcp `
+        -Direction Inbound `
+        -Priority $Priority `
+        -SourceAddressPrefix $cidr `
+        -SourcePortRange "*" `
+        -DestinationAddressPrefix "*" `
+        -DestinationPortRange 22
+} else {
+    $nsg = Add-AzNetworkSecurityRuleConfig `
+        -NetworkSecurityGroup $nsg `
+        -Name $RuleName `
+        -Description "Allow SSH from my current public IP only" `
+        -Access Allow `
+        -Protocol Tcp `
+        -Direction Inbound `
+        -Priority $Priority `
+        -SourceAddressPrefix $cidr `
+        -SourcePortRange "*" `
+        -DestinationAddressPrefix "*" `
+        -DestinationPortRange 22
+}
+
+$null = Set-AzNetworkSecurityGroup -NetworkSecurityGroup $nsg
 
 Write-Host "Done."

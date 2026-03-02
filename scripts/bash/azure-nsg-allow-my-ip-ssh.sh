@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Author: Shannon Eldridge-Kuehn c. 2026
+# Author: Shannon Kuehn
 # Purpose: Create or update an NSG rule to allow SSH (22) only from your current public IPv4 address (/32).
 # Usage:
 #   ./azure-nsg-allow-my-ip-ssh.sh <resource-group> <nsg-name> [rule-name] [priority]

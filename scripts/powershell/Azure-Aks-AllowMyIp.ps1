@@ -1,25 +1,9 @@
-function Assert-AzCliReady {
-    if (-not (Get-Command az -ErrorAction SilentlyContinue)) {
-        throw "Azure CLI (az) is required but was not found. Install it, then retry."
-    }
-
-    $null = & az account show 2>$null
-    if ($LASTEXITCODE -ne 0) {
-        throw "You are not logged in to Azure CLI. Run: az login"
-    }
-}
-
-
 <#
 .SYNOPSIS
 Restrict AKS API server access to your current public IPv4 address (/32).
 
 .AUTHOR
-Shannon Eldridge-Kuehn c. 2026
-
-.DESCRIPTION
-This sets the authorized IP ranges to only your current IP.
-If you need multiple ranges, update this script to merge them.
+Shannon Kuehn
 
 .PARAMETER ResourceGroup
 Resource group name.
@@ -27,8 +11,21 @@ Resource group name.
 .PARAMETER AksName
 AKS cluster name.
 
+.PARAMETER MergeExisting
+If set, merges your current IP into the existing Authorized IP ranges rather than overwriting.
+
+.PARAMETER WhatIf
+Shows what would happen if the command runs. No changes are made.
+
 .EXAMPLE
 ./Azure-Aks-AllowMyIp.ps1 -ResourceGroup myRg -AksName myAks
+
+.EXAMPLE
+./Azure-Aks-AllowMyIp.ps1 -ResourceGroup myRg -AksName myAks -MergeExisting
+
+.NOTES
+Uses Az.Aks cmdlets (no Azure CLI).
+This changes the AKS control plane allowlist. Be careful not to lock yourself out.
 #>
 
 Set-StrictMode -Version Latest
@@ -39,15 +36,38 @@ param(
     [string]$ResourceGroup,
 
     [Parameter(Mandatory=$true)]
-    [string]$AksName
+    [string]$AksName,
+
+    [switch]$MergeExisting,
+
+    [switch]$WhatIf
 )
 
-Assert-AzCliReady
+. "$PSScriptRoot/_Common.ps1"
+Assert-AzPowerShellReady
 
-$ip = (Invoke-RestMethod -Uri "https://api.ipify.org?format=json" -Method Get -TimeoutSec 15).ip
-$cidr = "$ip/32"
+$cidr = Get-PublicIpv4Cidr32
+$ranges = @($cidr)
 
-Write-Host "About to set AKS authorized IP ranges to: $cidr"
-Write-Host "Cluster: $AksName (RG: $ResourceGroup)"
-& az aks update -g $ResourceGroup -n $AksName --api-server-authorized-ip-ranges $cidr | Out-Host
+if ($MergeExisting) {
+    $cluster = Get-AzAksCluster -ResourceGroupName $ResourceGroup -Name $AksName
+    $existing = @()
+
+    if ($cluster.ApiServerAccessProfile -and $cluster.ApiServerAccessProfile.AuthorizedIPRanges) {
+        $existing = @($cluster.ApiServerAccessProfile.AuthorizedIPRanges)
+    }
+
+    $ranges = @($existing + $cidr | Sort-Object -Unique)
+}
+
+Write-Host "About to set AKS authorized IP ranges to:"
+$ranges | ForEach-Object { Write-Host "  - $_" }
+
+if ($WhatIf) {
+    Write-Host "WhatIf: Set-AzAksCluster -ResourceGroupName $ResourceGroup -Name $AksName -ApiServerAccessAuthorizedIpRange <ranges>"
+    return
+}
+
+$null = Set-AzAksCluster -ResourceGroupName $ResourceGroup -Name $AksName -ApiServerAccessAuthorizedIpRange $ranges
+
 Write-Host "Done."

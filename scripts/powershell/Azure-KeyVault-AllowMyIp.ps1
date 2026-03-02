@@ -1,15 +1,3 @@
-function Assert-AzCliReady {
-    if (-not (Get-Command az -ErrorAction SilentlyContinue)) {
-        throw "Azure CLI (az) is required but was not found. Install it, then retry."
-    }
-
-    $null = & az account show 2>$null
-    if ($LASTEXITCODE -ne 0) {
-        throw "You are not logged in to Azure CLI. Run: az login"
-    }
-}
-
-
 <#
 .SYNOPSIS
 Allowlist your current public IPv4 address (/32) on an Azure Key Vault firewall.
@@ -23,8 +11,14 @@ Resource group name.
 .PARAMETER KeyVaultName
 Key Vault name.
 
+.PARAMETER WhatIf
+Shows what would happen if the command runs. No changes are made.
+
 .EXAMPLE
 ./Azure-KeyVault-AllowMyIp.ps1 -ResourceGroup myRg -KeyVaultName myVault
+
+.NOTES
+Uses Az.KeyVault cmdlets (no Azure CLI).
 #>
 
 Set-StrictMode -Version Latest
@@ -35,14 +29,24 @@ param(
     [string]$ResourceGroup,
 
     [Parameter(Mandatory=$true)]
-    [string]$KeyVaultName
+    [string]$KeyVaultName,
+
+    [switch]$WhatIf
 )
 
-Assert-AzCliReady
+. "$PSScriptRoot/_Common.ps1"
+Assert-AzPowerShellReady
 
-$ip = (Invoke-RestMethod -Uri "https://api.ipify.org?format=json" -Method Get -TimeoutSec 15).ip
-$cidr = "$ip/32"
+$cidr = Get-PublicIpv4Cidr32
 
 Write-Host "About to allowlist $cidr on Key Vault: $KeyVaultName (RG: $ResourceGroup)"
-& az keyvault network-rule add --resource-group $ResourceGroup --name $KeyVaultName --ip-address $cidr | Out-Host
+
+if ($WhatIf) {
+    Write-Host "WhatIf: Add-AzKeyVaultNetworkRule -VaultName $KeyVaultName -ResourceGroupName $ResourceGroup -IpAddressRange $cidr"
+    return
+}
+
+$kv = Get-AzKeyVault -VaultName $KeyVaultName -ResourceGroupName $ResourceGroup
+$null = Add-AzKeyVaultNetworkRule -InputObject $kv -IpAddressRange $cidr
+
 Write-Host "Done."
